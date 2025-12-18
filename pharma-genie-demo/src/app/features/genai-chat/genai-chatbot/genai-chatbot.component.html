@@ -1,0 +1,125 @@
+<div class="genai-chatbot-container" [class.open]="isOpen">
+  <!-- Chat Toggle Button -->
+  <button class="chat-toggle" (click)="toggleChat()" [attr.aria-label]="isOpen ? 'Close chat' : 'Open chat'">
+    @if (!isOpen) {
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
+        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
+        <path d="M7 9h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2z"/>
+      </svg>
+    } @else {
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
+        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+      </svg>
+    }
+  </button>
+
+  <!-- Chat Window -->
+  @if (isOpen) {
+    <div class="chat-window">
+      <!-- Header -->
+      <div class="chat-header">
+        <div class="header-content">
+          <div class="header-icon">🤖</div>
+          <div class="header-text">
+            <h3>PharmaGenie AI</h3>
+            <p>GenAI Assistant</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="icon-btn" (click)="clearChat()" title="Clear chat" aria-label="Clear chat">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+              <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9zm7.5-5l-1-1h-5l-1 1H5v2h14V4z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div class="chat-body" #messagesContainer>
+        <div class="messages">
+          @if (messages().length === 0) {
+            <div class="welcome-message">
+              <div class="welcome-icon">🤖</div>
+              <h4>Welcome to PharmaGenie AI!</h4>
+              <p>Ask me anything about clinical trials, drugs, and research data.</p>
+            </div>
+          }
+
+          @for (message of messages(); track message.id) {
+            <div class="message" [class.user]="message.role === 'user'" [class.assistant]="message.role === 'assistant'">
+              <div class="message-avatar">
+                @if (message.role === 'user') {
+                  <span>👤</span>
+                } @else {
+                  <span>🤖</span>
+                }
+              </div>
+              <div class="message-content">
+                <div class="message-bubble">
+                  <div [innerHTML]="message.content | nl2br"></div>
+                  @if (message.model) {
+                    <div class="message-model">{{ message.model }}</div>
+                  }
+                </div>
+                <div class="message-time">{{ formatTimestamp(message.timestamp) }}</div>
+              </div>
+            </div>
+          }
+
+          @if (loading()) {
+            <div class="message assistant">
+              <div class="message-avatar">
+                <span>🤖</span>
+              </div>
+              <div class="message-content">
+                <div class="message-bubble">
+                  <div class="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+
+          @if (error()) {
+            <div class="error-message">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+              </svg>
+              <span>{{ error() }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Input -->
+      <div class="chat-footer">
+        <div class="input-wrapper">
+          <textarea
+            [(ngModel)]="userInput"
+            (keydown)="onKeyPress($event)"
+            [disabled]="loading()"
+            placeholder="Ask about trials, drugs, or clinical data..."
+            rows="1"
+            class="chat-input"
+          ></textarea>
+          <button 
+            class="send-btn" 
+            (click)="sendMessage()" 
+            [disabled]="!userInput().trim() || loading()"
+          >
+            @if (loading()) {
+              <span class="spinner"></span>
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+              </svg>
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

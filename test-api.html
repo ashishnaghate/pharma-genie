@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PharmaGenie API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        button { padding: 10px 20px; margin: 5px; }
+        #response { 
+            margin-top: 20px; 
+            padding: 15px; 
+            background: #f5f5f5; 
+            border-radius: 5px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>PharmaGenie API Test</h1>
+    
+    <div>
+        <input type="text" id="query" placeholder="Enter your query" style="width: 400px; padding: 10px;" value="Show all active trials">
+        <button onclick="testAPI()">Test API</button>
+    </div>
+    
+    <div id="response"></div>
+
+    <script>
+        async function testAPI() {
+            const query = document.getElementById('query').value;
+            const responseDiv = document.getElementById('response');
+            
+            try {
+                responseDiv.textContent = 'Sending request...';
+                
+                const response = await fetch('http://localhost:3000/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ query })
+                });
+                
+                const data = await response.json();
+                responseDiv.textContent = JSON.stringify(data, null, 2);
+                console.log('API Response:', data);
+                
+            } catch (error) {
+                responseDiv.textContent = 'Error: ' + error.message;
+                console.error('API Error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

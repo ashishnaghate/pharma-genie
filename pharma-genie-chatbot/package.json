@@ -1,0 +1,41 @@
+{
+  "name": "pharma-genie-chatbot",
+  "version": "1.0.0",
+  "description": "PharmaGenie - An intelligent chatbot for pharma clinical trials with NLP capabilities",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc && npm run copy-assets",
+    "copy-assets": "xcopy src\\lib\\components\\*.html dist\\lib\\components\\ /Y && xcopy src\\lib\\components\\*.css dist\\lib\\components\\ /Y",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "angular",
+    "chatbot",
+    "pharma",
+    "clinical-trials",
+    "nlp",
+    "healthcare"
+  ],
+  "author": "",
+  "license": "MIT",
+  "peerDependencies": {
+    "@angular/common": "^17.3.0",
+    "@angular/core": "^17.3.0",
+    "@angular/forms": "^17.3.0"
+  },
+  "devDependencies": {
+    "@angular/common": "^17.3.0",
+    "@angular/core": "^17.3.0",
+    "@angular/forms": "^17.3.0",
+    "typescript": "~5.4.0",
+    "rxjs": "~7.8.0"
+  },
+  "dependencies": {
+    "tslib": "^2.6.0"
+  }
+}

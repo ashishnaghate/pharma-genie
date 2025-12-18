@@ -1,0 +1,103 @@
+<div class="landing-container">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <h1>Welcome to PharmaGenie NLP</h1>
+    <p>
+      Intelligent chatbot for pharmaceutical clinical trials using Natural Language Processing
+    </p>
+  </section>
+
+  <!-- Content Section -->
+  <div class="content-section">
+    <!-- Features Grid -->
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🧠</div>
+        <h3>NLP Powered</h3>
+        <p>Natural language understanding with advanced processing</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Multiple Formats</h3>
+        <p>Export to CSV & Excel for analysis</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3>Pharma Theme</h3>
+        <p>Professional medical design interface</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">♿</div>
+        <h3>Accessible</h3>
+        <p>WCAG 2.1 compliant design</p>
+      </div>
+    </div>
+
+    <!-- Demo Section -->
+    <div class="demo-section">
+      <h2>Try the NLP Chatbot</h2>
+      <p>Click the chat button in the bottom-right corner to start your NLP-powered conversation!</p>
+      
+      <div class="examples-list">
+        @for (query of exampleQueries; track query) {
+          <div class="example-item">
+            <strong>Q:</strong> {{ query }}
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Info Box -->
+    <div class="info-box">
+      <h3>💡 Getting Started</h3>
+      <ul>
+        <li>Make sure the backend server is running on http://localhost:3000</li>
+        <li>Click the floating chat button in the bottom-right corner</li>
+        <li>Type your question or try one of the example queries above</li>
+        <li>Export results to CSV or Excel for further analysis</li>
+      </ul>
+    </div>
+
+    <!-- Tech Section -->
+    <div class="tech-section">
+      <h2>NLP Technology Stack</h2>
+      <div class="tech-grid">
+        <div class="tech-item">
+          <h3>NLP Models</h3>
+          <ul>
+            <li>Natural.js</li>
+            <li>Compromise Library</li>
+            <li>MongoDB Integration</li>
+          </ul>
+        </div>
+        <div class="tech-item">
+          <h3>Capabilities</h3>
+          <ul>
+            <li>Query Processing</li>
+            <li>CSV Export</li>
+            <li>Excel Export</li>
+            <li>Real-time Chat</li>
+          </ul>
+        </div>
+        <div class="tech-item">
+          <h3>Integration</h3>
+          <ul>
+            <li>REST API</li>
+            <li>MongoDB Atlas</li>
+            <li>Angular 17.3</li>
+            <li>TypeScript 5.4</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>&copy; 2024 PharmaGenie - Clinical Trials Intelligence</p>
+      <p>Built with Angular 17.3, TypeScript 5.4, and NLP</p>
+    </footer>
+  </div>
+</div>
+
+<!-- Chatbot Component -->
+<app-chatbot [config]="chatConfig"></app-chatbot>

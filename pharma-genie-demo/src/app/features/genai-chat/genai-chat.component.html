@@ -1,0 +1,104 @@
+<div class="landing-container">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <h1>Welcome to PharmaGenie AI</h1>
+    <p>
+      Advanced AI-powered chatbot for pharmaceutical clinical trials using Generative AI
+    </p>
+  </section>
+
+  <!-- Content Section -->
+  <div class="content-section">
+    <!-- Features Grid -->
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🤖</div>
+        <h3>GenAI Powered</h3>
+        <p>Advanced AI understanding with latest language models</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💾</div>
+        <h3>Database Integration</h3>
+        <p>Real-time access to MongoDB clinical trials data</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3>Context Aware</h3>
+        <p>Session-based conversations with memory</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Fast & Accurate</h3>
+        <p>Powered by HCL AI Cafe GPT-4.1</p>
+      </div>
+    </div>
+
+    <!-- Demo Section -->
+    <div class="demo-section">
+      <h2>Try the AI Chatbot</h2>
+      <p>Click the chat button in the bottom-right corner to start your AI-powered conversation!</p>
+      
+      <div class="examples-list">
+        @for (query of exampleQueries; track query) {
+          <div class="example-item">
+            <strong>Q:</strong> {{ query }}
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Info Box -->
+    <div class="info-box">
+      <h3>💡 Getting Started</h3>
+      <ul>
+        <li>Make sure the backend server is running on http://localhost:3000</li>
+        <li>Click the floating chat button in the bottom-right corner</li>
+        <li>Type your question or try one of the example queries above</li>
+        <li>AI responses are powered by database context for accurate results</li>
+      </ul>
+    </div>
+
+    <!-- Tech Section -->
+    <div class="tech-section">
+      <h2>AI Technology Stack</h2>
+      <div class="tech-grid">
+        <div class="tech-item">
+          <h3>AI Models</h3>
+          <ul>
+            <li>HCL AI Cafe (GPT-4.1)</li>
+            <li>NLP Processing</li>
+            <li>MongoDB Integration</li>
+          </ul>
+        </div>
+        <div class="tech-item">
+          <h3>Capabilities</h3>
+          <ul>
+            <li>Database-Aware Responses</li>
+            <li>Context Retention</li>
+            <li>Session Management</li>
+            <li>NLP Query Analysis</li>
+          </ul>
+        </div>
+        <div class="tech-item">
+          <h3>Integration</h3>
+          <ul>
+            <li>REST API</li>
+            <li>MongoDB Atlas</li>
+            <li>Real-time Data Access</li>
+            <li>Angular 17.3</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>&copy; 2024 PharmaGenie - AI-Powered Clinical Trials Intelligence</p>
+      <p>Built with Angular 17.3, TypeScript 5.4, and GenAI</p>
+    </footer>
+  </div>
+</div>
+
+<!-- GenAI Floating Chatbot -->
+<app-genai-chatbot></app-genai-chatbot>
+
