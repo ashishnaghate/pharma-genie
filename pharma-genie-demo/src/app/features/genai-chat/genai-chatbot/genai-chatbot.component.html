@@ -98,7 +98,8 @@
       <div class="chat-footer">
         <div class="input-wrapper">
           <textarea
-            [(ngModel)]="userInput"
+            [ngModel]="userInput()"
+            (ngModelChange)="userInput.set($event)"
             (keydown)="onKeyPress($event)"
             [disabled]="loading()"
             placeholder="Ask about trials, drugs, or clinical data..."

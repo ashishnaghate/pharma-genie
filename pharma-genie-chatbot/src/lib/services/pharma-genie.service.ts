@@ -88,9 +88,15 @@ export class PharmaGenieService {
     return this.http.post<ChatResponse>(`${this.config.apiUrl}/api/chat`, { query });
   }
 
-  exportData(data: TrialData[], format: 'csv' | 'excel'): Observable<Blob> {
+  exportData(data: any, format: 'csv' | 'excel'): Observable<Blob> {
     const endpoint = format === 'csv' ? '/api/export/csv' : '/api/export/excel';
-    return this.http.post(`${this.config.apiUrl}${endpoint}`, { data }, {
+    
+    // Check if data is consolidated response format or legacy array
+    const payload = Array.isArray(data) 
+      ? { data, collectionType: 'trials' }  // Legacy format
+      : { responseData: data };  // New consolidated format
+    
+    return this.http.post(`${this.config.apiUrl}${endpoint}`, payload, {
       responseType: 'blob'
     });
   }

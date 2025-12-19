@@ -4,14 +4,13 @@ import bodyParser from 'body-parser';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import ExcelJS from 'exceljs';
-import { createObjectCsvWriter } from 'csv-writer';
 import dotenv from 'dotenv';
 import database from './config/database.js';
 import { ClinicalTrial, Drug, TrialSite, Participant, AdverseEvent } from './models/index.js';
 import NLPService from './nlp-service.js';
 import genaiRoutes from './routes/genai.routes.js';
 import { requestLogger, errorLogger, errorHandler } from './middleware/logger.middleware.js';
+import { exportToCSV, exportToExcel, exportMultiCollectionToExcel, getSingleCollectionType } from './utils/export-utils.js';
 
 dotenv.config();
 
@@ -104,43 +103,48 @@ app.post('/api/chat', async (req, res) => {
 
 app.post('/api/export/csv', async (req, res) => {
   try {
-    const { data } = req.body;
+    const { data, collectionType, responseData } = req.body;
 
-    if (!data || !Array.isArray(data)) {
-      return res.status(400).json({ error: 'Invalid data for export' });
+    // Ensure exports directory exists
+    const exportsDir = path.join(__dirname, 'exports');
+    if (!fs.existsSync(exportsDir)) {
+      fs.mkdirSync(exportsDir, { recursive: true });
     }
 
-    const csvPath = path.join(__dirname, 'exports', `trials-${Date.now()}.csv`);
-    
-    if (!fs.existsSync(path.join(__dirname, 'exports'))) {
-      fs.mkdirSync(path.join(__dirname, 'exports'));
-    }
-
-    const csvWriter = createObjectCsvWriter({
-      path: csvPath,
-      header: [
-        { id: 'trialId', title: 'Trial ID' },
-        { id: 'title', title: 'Title' },
-        { id: 'sponsor', title: 'Sponsor' },
-        { id: 'drug', title: 'Drug' },
-        { id: 'indication', title: 'Indication' },
-        { id: 'phase', title: 'Phase' },
-        { id: 'status', title: 'Status' },
-        { id: 'startDate', title: 'Start Date' },
-        { id: 'endDate', title: 'End Date' },
-        { id: 'currentEnrollment', title: 'Enrolled' },
-        { id: 'enrollmentTarget', title: 'Target' },
-      ]
-    });
-
-    await csvWriter.writeRecords(data);
-
-    res.download(csvPath, 'clinical-trials.csv', (err) => {
-      if (err) {
-        console.error('Error downloading file:', err);
+    // If responseData is provided (multi-collection), check if it's from single collection
+    if (responseData) {
+      const singleType = getSingleCollectionType(responseData);
+      
+      if (singleType && responseData[singleType].length > 1) {
+        // Single collection with multiple records - export as CSV
+        const filename = `${singleType}-${Date.now()}.csv`;
+        const csvPath = path.join(exportsDir, filename);
+        
+        await exportToCSV(responseData[singleType], singleType, csvPath);
+        
+        res.download(csvPath, filename, (err) => {
+          if (err) console.error('Error downloading file:', err);
+          fs.unlinkSync(csvPath);
+        });
+      } else {
+        return res.status(400).json({ 
+          error: 'CSV export is only available for single collection with multiple records. Use Excel for multi-collection data.' 
+        });
       }
-      fs.unlinkSync(csvPath);
-    });
+    } else if (data && collectionType) {
+      // Legacy support - direct data export
+      const filename = `${collectionType}-${Date.now()}.csv`;
+      const csvPath = path.join(exportsDir, filename);
+      
+      await exportToCSV(data, collectionType, csvPath);
+      
+      res.download(csvPath, filename, (err) => {
+        if (err) console.error('Error downloading file:', err);
+        fs.unlinkSync(csvPath);
+      });
+    } else {
+      return res.status(400).json({ error: 'Invalid export request' });
+    }
 
   } catch (error) {
     console.error('Error exporting CSV:', error);
@@ -150,54 +154,55 @@ app.post('/api/export/csv', async (req, res) => {
 
 app.post('/api/export/excel', async (req, res) => {
   try {
-    const { data } = req.body;
+    const { data, collectionType, responseData } = req.body;
 
-    if (!data || !Array.isArray(data)) {
-      return res.status(400).json({ error: 'Invalid data for export' });
+    // Ensure exports directory exists
+    const exportsDir = path.join(__dirname, 'exports');
+    if (!fs.existsSync(exportsDir)) {
+      fs.mkdirSync(exportsDir, { recursive: true });
     }
 
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('Clinical Trials');
-
-    worksheet.columns = [
-      { header: 'Trial ID', key: 'trialId', width: 15 },
-      { header: 'Title', key: 'title', width: 50 },
-      { header: 'Sponsor', key: 'sponsor', width: 25 },
-      { header: 'Drug', key: 'drug', width: 15 },
-      { header: 'Indication', key: 'indication', width: 30 },
-      { header: 'Phase', key: 'phase', width: 12 },
-      { header: 'Status', key: 'status', width: 12 },
-      { header: 'Start Date', key: 'startDate', width: 12 },
-      { header: 'End Date', key: 'endDate', width: 12 },
-      { header: 'Enrolled', key: 'currentEnrollment', width: 10 },
-      { header: 'Target', key: 'enrollmentTarget', width: 10 },
-    ];
-
-    worksheet.getRow(1).font = { bold: true };
-    worksheet.getRow(1).fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: 'FF4A90E2' }
-    };
-
-    data.forEach(trial => {
-      worksheet.addRow(trial);
-    });
-
-    const excelPath = path.join(__dirname, 'exports', `trials-${Date.now()}.xlsx`);
-    
-    if (!fs.existsSync(path.join(__dirname, 'exports'))) {
-      fs.mkdirSync(path.join(__dirname, 'exports'));
-    }
-
-    await workbook.xlsx.writeFile(excelPath);
-
-    res.download(excelPath, 'clinical-trials.xlsx', (err) => {
-      if (err) {
-        console.error('Error downloading file:', err);
+    // If responseData is provided (multi-collection or single collection)
+    if (responseData) {
+      const singleType = getSingleCollectionType(responseData);
+      
+      if (singleType) {
+        // Single collection - export to Excel
+        const filename = `${singleType}-${Date.now()}.xlsx`;
+        const excelPath = path.join(exportsDir, filename);
+        
+        await exportToExcel(responseData[singleType], singleType, excelPath);
+        
+        res.download(excelPath, filename, (err) => {
+          if (err) console.error('Error downloading file:', err);
+          fs.unlinkSync(excelPath);
+        });
+      } else {
+        // Multi-collection - export all to Excel with multiple sheets
+        const filename = `pharma-data-${Date.now()}.xlsx`;
+        const excelPath = path.join(exportsDir, filename);
+        
+        await exportMultiCollectionToExcel(responseData, excelPath);
+        
+        res.download(excelPath, filename, (err) => {
+          if (err) console.error('Error downloading file:', err);
+          fs.unlinkSync(excelPath);
+        });
       }
-      fs.unlinkSync(excelPath);
-    });
+    } else if (data && collectionType) {
+      // Legacy support - direct data export
+      const filename = `${collectionType}-${Date.now()}.xlsx`;
+      const excelPath = path.join(exportsDir, filename);
+      
+      await exportToExcel(data, collectionType, excelPath);
+      
+      res.download(excelPath, filename, (err) => {
+        if (err) console.error('Error downloading file:', err);
+        fs.unlinkSync(excelPath);
+      });
+    } else {
+      return res.status(400).json({ error: 'Invalid export request' });
+    }
 
   } catch (error) {
     console.error('Error exporting Excel:', error);
@@ -415,6 +420,7 @@ function formatResponse(query, results, analysis) {
         participants: totalParticipants,
         adverseEvents: totalAdverseEvents
       },
+      aiInsight: `Found ${totalResults} total records across all collections.`,
       ...responseData
     };
   }
@@ -433,6 +439,7 @@ function formatResponse(query, results, analysis) {
         participants: totalParticipants,
         adverseEvents: totalAdverseEvents
       },
+      aiInsight: `Detailed information for trial ${analysis.filters.trialId}.`,
       ...responseData
     };
   }
@@ -450,6 +457,7 @@ function formatResponse(query, results, analysis) {
       participants: totalParticipants,
       adverseEvents: totalAdverseEvents
     },
+    aiInsight: `Retrieved ${totalResults} records matching your query.`,
     ...responseData
   };
 }

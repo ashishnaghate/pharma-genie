@@ -70,6 +70,52 @@ export class ChatbotComponent implements OnInit, OnDestroy {
     this.pharmaGenieService.clearMessages();
   }
 
+  /**
+   * Check if CSV export is allowed (only for single collection with >1 record)
+   */
+  canExportCSV(message: ChatMessage): boolean {
+    if (!message.data || !message.data.summary) return false;
+    
+    const collections = ['trials', 'drugs', 'sites', 'participants', 'adverseEvents'];
+    let nonEmptyCount = 0;
+    
+    collections.forEach(col => {
+      if (message.data[col] && Array.isArray(message.data[col]) && message.data[col].length > 0) {
+        nonEmptyCount++;
+      }
+    });
+    
+    // CSV only for single collection
+    return nonEmptyCount === 1;
+  }
+
+  /**
+   * Export message data (new consolidated format)
+   */
+  exportMessageData(message: ChatMessage, format: 'csv' | 'excel'): void {
+    if (!message.data) return;
+
+    this.pharmaGenieService.exportData(message.data, format).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `pharma-data-${Date.now()}.${format === 'csv' ? 'csv' : 'xlsx'}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        console.log(`✅ Exported data as ${format.toUpperCase()}`);
+      },
+      error: (error) => {
+        console.error(`❌ Export error:`, error);
+      }
+    });
+  }
+
+  /**
+   * Legacy export for old data format
+   */
   exportData(format: 'csv' | 'excel'): void {
     const lastMessage = this.messages[this.messages.length - 1];
     if (lastMessage?.data && Array.isArray(lastMessage.data)) {

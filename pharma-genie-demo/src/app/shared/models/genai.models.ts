@@ -9,12 +9,39 @@ export interface GenAIMessage {
   timestamp: Date;
   tokens?: number;
   model?: string;
+  responseData?: GenAIResponse;  // Full response data for export
 }
 
 export interface GenAIChatRequest {
   sessionId: string;
   message: string;
   context?: Record<string, unknown>;
+}
+
+export interface GenAIResponse {
+  type: 'text' | 'count' | 'detail' | 'list';
+  content: string;
+  summary?: {
+    totalRecords: number;
+    trials: number;
+    drugs: number;
+    sites: number;
+    participants: number;
+    adverseEvents: number;
+  };
+  statistics?: any;
+  trials?: any[];
+  drugs?: any[];
+  sites?: any[];
+  participants?: any[];
+  adverseEvents?: any[];
+  aiInsight?: string;
+  genai?: {
+    reply: string;
+    model: string;
+    tokens: number;
+    latencyMs: number;
+  };
 }
 
 export interface GenAIChatResponse {

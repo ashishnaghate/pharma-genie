@@ -47,7 +47,7 @@ export class MockProvider extends GenAIProvider {
     const lowerMessage = message.toLowerCase();
 
     // Context-aware responses
-    if (context && Object.keys(context).length > 0) {
+    if (context && (context.clinicalTrials || context.drugs || context.adverseEvents)) {
       return this.generateContextualResponse(message, context);
     }
 
@@ -117,19 +117,60 @@ What would you like to know? Please ask specific questions about our database or
 
   generateContextualResponse(message, context) {
     const parts = [];
-
-    if (context.clinicalTrials && context.clinicalTrials.length > 0) {
-      const trial = context.clinicalTrials[0];
-      parts.push(`I found information about ${context.clinicalTrials.length} clinical trial(s). For example, ${trial.title || trial.id} is in Phase ${trial.phase} with ${trial.enrollmentCount || 'N/A'} participants.`);
+    
+    // Include database statistics if available
+    if (context.databaseResults) {
+      const stats = context.databaseResults;
+      const totalRecords = stats.totalRecords || 0;
+      
+      if (totalRecords > 0) {
+        // Build a detailed breakdown
+        const breakdown = [];
+        if (stats.trials > 0) breakdown.push(`${stats.trials} clinical trial${stats.trials !== 1 ? 's' : ''}`);
+        if (stats.drugs > 0) breakdown.push(`${stats.drugs} drug${stats.drugs !== 1 ? 's' : ''}`);
+        if (stats.sites > 0) breakdown.push(`${stats.sites} trial site${stats.sites !== 1 ? 's' : ''}`);
+        if (stats.participants > 0) breakdown.push(`${stats.participants} participant${stats.participants !== 1 ? 's' : ''}`);
+        if (stats.adverseEvents > 0) breakdown.push(`${stats.adverseEvents} adverse event${stats.adverseEvents !== 1 ? 's' : ''}`);
+        
+        parts.push(`📊 **Query Results: ${totalRecords} total record${totalRecords !== 1 ? 's' : ''} found**\n\nBreakdown:\n- ${breakdown.join('\n- ')}`);
+      } else {
+        parts.push(`📊 **Query Results: 0 records found**\n\nNo matching data found in the database for your query.`);
+      }
     }
 
-    if (context.drugs && context.drugs.length > 0) {
-      const drug = context.drugs[0];
-      parts.push(`Our database shows ${context.drugs.length} drug(s) matching your query. ${drug.name || drug.id} belongs to the ${drug.therapeuticArea || 'unspecified'} therapeutic area.`);
-    }
+    // Include sample data if available
+    if (context.data) {
+      if (context.data.trials && context.data.trials.length > 0) {
+        const trial = context.data.trials[0];
+        parts.push(`\n**Sample Clinical Trial:**\n- Trial ID: ${trial.trialId || trial.id}\n- Title: ${trial.title || 'N/A'}\n- Phase: ${trial.phase || 'N/A'}\n- Status: ${trial.status || 'N/A'}\n- Drug: ${trial.drug || 'N/A'}`);
+      }
 
-    if (context.adverseEvents && context.adverseEvents.length > 0) {
-      parts.push(`I found ${context.adverseEvents.length} adverse event record(s) in our safety database.`);
+      if (context.data.drugs && context.data.drugs.length > 0) {
+        const drug = context.data.drugs[0];
+        parts.push(`\n**Sample Drug:**\n- Drug ID: ${drug.drugId || drug.id}\n- Name: ${drug.name || 'N/A'}\n- Class: ${drug.class || 'N/A'}\n- Approval Status: ${typeof drug.approvalStatus === 'string' ? drug.approvalStatus : drug.approvalStatus?.status || 'N/A'}`);
+      }
+      
+      if (context.data.sites && context.data.sites.length > 0) {
+        const site = context.data.sites[0];
+        parts.push(`\n**Sample Trial Site:**\n- Site ID: ${site.siteId || site.id}\n- Name: ${site.name || 'N/A'}\n- Location: ${site.address?.city || 'N/A'}, ${site.address?.country || 'N/A'}`);
+      }
+    }
+    
+    // Legacy support for old context format
+    if (!context.databaseResults) {
+      if (context.clinicalTrials && context.clinicalTrials.length > 0) {
+        const trial = context.clinicalTrials[0];
+        parts.push(`I found information about ${context.clinicalTrials.length} clinical trial(s). For example, ${trial.title || trial.id} is in Phase ${trial.phase} with ${trial.enrollmentCount || 'N/A'} participants.`);
+      }
+
+      if (context.drugs && context.drugs.length > 0) {
+        const drug = context.drugs[0];
+        parts.push(`Our database shows ${context.drugs.length} drug(s) matching your query. ${drug.name || drug.id} belongs to the ${drug.therapeuticArea || 'unspecified'} therapeutic area.`);
+      }
+
+      if (context.adverseEvents && context.adverseEvents.length > 0) {
+        parts.push(`I found ${context.adverseEvents.length} adverse event record(s) in our safety database.`);
+      }
     }
 
     if (parts.length > 0) {

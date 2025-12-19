@@ -415,7 +415,53 @@
   background: var(--pg-border);
   cursor: not-allowed;
   opacity: 0.5;
-}pg-footer-info {
+}
+
+/* Export button styles */
+.pg-btn-export {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pg-btn-export:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.pg-btn-export:active {
+  transform: translateY(0);
+}
+
+.csv-btn:hover {
+  background: #f0fdf4;
+  border-color: #86efac;
+  color: #166534;
+}
+
+.excel-btn:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #1e40af;
+}
+
+.pg-btn-export svg {
+  width: 14px;
+  height: 14px;
+}
+
+.pg-footer-info {
   text-align: center;
   margin-top: 8px;
 }

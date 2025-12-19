@@ -148,70 +148,32 @@
                     </div>
                   </div>
                 </details>
-              </div>
-              
-              <!-- Detailed view (single trial) -->
-              <div *ngIf="message.type === 'detailed' && message.data && message.data.length > 0">
-                <div [innerHTML]="message.text"></div>
-                <div class="pg-trials-list">
-                  <div *ngFor="let trial of message.data" class="pg-trial-item">
-                    <div class="pg-trial-header">
-                      <strong>{{ trial.id || trial.trialId }}</strong>
-                      <span class="pg-badge" [ngClass]="'pg-status-' + trial.status?.toLowerCase()">
-                        {{ trial.status }}
-                      </span>
-                    </div>
-                    <div class="pg-trial-title">{{ trial.title }}</div>
-                    <div class="pg-trial-meta">
-                      <span>{{ trial.drug }}</span> • 
-                      <span>{{ trial.phase }}</span> • 
-                      <span>{{ trial.indication }}</span>
-                    </div>
-                    <div class="pg-trial-meta" style="margin-top: 8px;">
-                      <span>Sponsor: {{ trial.sponsor }}</span>
-                    </div>
-                    <div class="pg-trial-meta">
-                      <span>Enrollment: {{ trial.enrollmentProgress || trial.currentEnrollment + '/' + trial.enrollmentTarget }}</span>
-                    </div>
+                
+                <!-- Export buttons for consolidated data -->
+                <div *ngIf="message.data.summary && message.data.summary.totalRecords > 1" class="pg-export-actions" style="margin-top: 15px;">
+                  <div style="font-size: 12px; color: #6b7280; margin-bottom: 8px; font-weight: 500;">
+                    📥 Export {{ message.data.summary.totalRecords }} records:
                   </div>
-                </div>
-                <div class="pg-export-actions">
-                  <button class="pg-btn-export" (click)="exportData('csv')">
-                    📄 Export CSV
-                  </button>
-                  <button class="pg-btn-export" (click)="exportData('excel')">
-                    📊 Export Excel
-                  </button>
-                </div>
-              </div>
-              
-              <!-- Legacy list view (without statistics) - fallback for old data structure -->
-              <div *ngIf="message.type === 'list' && message.data && !message.data.statistics">
-                <!-- Simple trial list (legacy) -->
-                <div *ngIf="message.data.length > 0" class="pg-trials-list">
-                  <div *ngFor="let trial of message.data" class="pg-trial-item">
-                    <div class="pg-trial-header">
-                      <strong>{{ trial.id }}</strong>
-                      <span class="pg-badge" [ngClass]="'pg-status-' + trial.status.toLowerCase()">
-                        {{ trial.status }}
-                      </span>
-                    </div>
-                    <div class="pg-trial-title">{{ trial.title }}</div>
-                    <div class="pg-trial-meta">
-                      <span>{{ trial.drug }}</span> • 
-                      <span>{{ trial.phase }}</span> • 
-                      <span>{{ trial.indication }}</span>
-                    </div>
+                  <div style="display: flex; gap: 8px;">
+                    <button *ngIf="canExportCSV(message)" class="pg-btn-export csv-btn" (click)="exportMessageData(message, 'csv')">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="12" y1="18" x2="12" y2="12"></line>
+                        <line x1="9" y1="15" x2="15" y2="15"></line>
+                      </svg>
+                      CSV
+                    </button>
+                    <button class="pg-btn-export excel-btn" (click)="exportMessageData(message, 'excel')">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="12" y1="18" x2="12" y2="12"></line>
+                        <line x1="9" y1="15" x2="15" y2="15"></line>
+                      </svg>
+                      Excel
+                    </button>
                   </div>
-                </div>
-
-                <div class="pg-export-actions" *ngIf="message.data.length > 0">
-                  <button class="pg-btn-export" (click)="exportData('csv')">
-                    📄 Export CSV
-                  </button>
-                  <button class="pg-btn-export" (click)="exportData('excel')">
-                    📊 Export Excel
-                  </button>
                 </div>
               </div>
             </div>
