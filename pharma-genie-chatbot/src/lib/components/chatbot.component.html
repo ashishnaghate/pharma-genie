@@ -149,10 +149,10 @@
                   </div>
                 </details>
                 
-                <!-- Export buttons for consolidated data (NLP mode only) -->
-                <div *ngIf="!isGenAIMode && message.data.summary && message.data.summary.totalRecords > 1" class="pg-export-actions" style="margin-top: 15px;">
+                <!-- Export buttons for consolidated data (Both NLP and GenAI modes) -->
+                <div *ngIf="shouldShowExportButtons(message)" class="pg-export-actions" style="margin-top: 15px;">
                   <div style="font-size: 12px; color: #6b7280; margin-bottom: 8px; font-weight: 500;">
-                    📥 Export {{ message.data.summary.totalRecords }} records:
+                    📥 Export {{ message.data.summary.totalRecords }} records from {{ getExportCollectionName(message) }}:
                   </div>
                   <div style="display: flex; gap: 8px;">
                     <button *ngIf="canExportCSV(message)" class="pg-btn-export csv-btn" (click)="exportMessageData(message, 'csv')">

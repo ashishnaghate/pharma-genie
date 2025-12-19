@@ -15,7 +15,7 @@ export class GenAIChatComponent {
     mode: 'genai' as const,
     theme: 'light' as const,
     position: 'bottom-right' as const,
-    enableExport: false,  // GenAI mode doesn't support export
+    enableExport: true,  // ✅ Enable export for GenAI mode
     welcomeMessage: 'Hello! I\'m PharmaGenie\'s GenAI assistant, powered by HCL AI Cafe. Ask me anything!'
   };
   exampleQueries = [

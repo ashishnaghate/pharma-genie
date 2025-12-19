@@ -82,6 +82,57 @@ export class ChatbotComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Check if export buttons should be shown
+   * Shows if >1 record from same collection (both NLP and GenAI modes)
+   */
+  shouldShowExportButtons(message: ChatMessage): boolean {
+    if (!message.data || !message.data.summary) return false;
+    
+    const totalRecords = message.data.summary.totalRecords || 0;
+    if (totalRecords <= 1) return false;
+    
+    // Check if records are from a single collection
+    const collections = ['trials', 'drugs', 'sites', 'participants', 'adverseEvents'];
+    let nonEmptyCollections = 0;
+    
+    collections.forEach(col => {
+      if (message.data[col] && Array.isArray(message.data[col]) && message.data[col].length > 0) {
+        nonEmptyCollections++;
+      }
+    });
+    
+    // Show export if we have data from at least one collection
+    return nonEmptyCollections >= 1;
+  }
+
+  /**
+   * Get the collection name for export label
+   */
+  getExportCollectionName(message: ChatMessage): string {
+    if (!message.data) return '';
+    
+    const collections = [
+      { key: 'trials', name: 'Clinical Trials' },
+      { key: 'drugs', name: 'Drugs' },
+      { key: 'sites', name: 'Trial Sites' },
+      { key: 'participants', name: 'Participants' },
+      { key: 'adverseEvents', name: 'Adverse Events' }
+    ];
+    
+    const activeCollections = collections.filter(col => 
+      message.data[col.key] && Array.isArray(message.data[col.key]) && message.data[col.key].length > 0
+    );
+    
+    if (activeCollections.length === 1) {
+      return activeCollections[0].name;
+    } else if (activeCollections.length > 1) {
+      return 'Multiple Collections';
+    }
+    
+    return 'Data';
+  }
+
+  /**
    * Check if CSV export is allowed (only for single collection with >1 record)
    */
   canExportCSV(message: ChatMessage): boolean {
