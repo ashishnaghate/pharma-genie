@@ -36,7 +36,8 @@ export class HCLAICafeProvider extends GenAIProvider {
 
       const url = `${this.endpoint}/deployments/${this.deploymentName}/chat/completions?api-version=${this.apiVersion}`;
 
-      const response = await fetch(url, {
+      // Use node-fetch options to bypass SSL certificate validation in development
+      const fetchOptions = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -48,7 +49,14 @@ export class HCLAICafeProvider extends GenAIProvider {
           temperature: this.config.temperature || 0.7,
           maxTokens: this.config.maxTokens || 2000,
         }),
-      });
+      };
+
+      // In development, bypass SSL certificate validation
+      if (process.env.NODE_ENV === 'development') {
+        process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+      }
+
+      const response = await fetch(url, fetchOptions);
 
       if (!response.ok) {
         const error = await response.json();
@@ -91,7 +99,8 @@ export class HCLAICafeProvider extends GenAIProvider {
 
       const url = `${this.endpoint}/deployments/${this.deploymentName}/chat/completions?api-version=${this.apiVersion}`;
 
-      const response = await fetch(url, {
+      // Use node-fetch options to bypass SSL certificate validation in development
+      const fetchOptions = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -104,7 +113,14 @@ export class HCLAICafeProvider extends GenAIProvider {
           maxTokens: this.config.maxTokens || 2000,
           stream: true,
         }),
-      });
+      };
+
+      // In development, bypass SSL certificate validation
+      if (process.env.NODE_ENV === 'development') {
+        process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+      }
+
+      const response = await fetch(url, fetchOptions);
 
       if (!response.ok) {
         throw new Error(`HCL AI Cafe stream error: ${response.statusText}`);

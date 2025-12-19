@@ -21,6 +21,7 @@ export class ChatbotComponent implements OnInit, OnDestroy {
   isOpen: boolean = false;
   isLoading: boolean = false;
   private destroy$ = new Subject<void>();
+  currentConfig: any;
 
   constructor(private pharmaGenieService: PharmaGenieService) {}
 
@@ -28,6 +29,8 @@ export class ChatbotComponent implements OnInit, OnDestroy {
     if (this.config) {
       this.pharmaGenieService.setConfig(this.config);
     }
+
+    this.currentConfig = this.pharmaGenieService.getConfig();
 
     this.pharmaGenieService.messages$
       .pipe(takeUntil(this.destroy$))
@@ -41,6 +44,14 @@ export class ChatbotComponent implements OnInit, OnDestroy {
       .subscribe(loading => {
         this.isLoading = loading;
       });
+  }
+
+  get chatbotMode(): string {
+    return this.currentConfig?.mode === 'genai' ? 'GenAI Assistant' : 'NLP Assistant';
+  }
+
+  get isGenAIMode(): boolean {
+    return this.currentConfig?.mode === 'genai';
   }
 
   ngOnDestroy(): void {

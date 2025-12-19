@@ -1,15 +1,23 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { GenAIChatbotComponent } from './genai-chatbot/genai-chatbot.component';
+import { ChatbotComponent } from 'pharma-genie-chatbot';
 
 @Component({
   selector: 'app-genai-chat',
   standalone: true,
-  imports: [CommonModule, GenAIChatbotComponent],
+  imports: [CommonModule, ChatbotComponent],
   templateUrl: './genai-chat.component.html',
   styleUrls: ['./genai-chat.component.css']
 })
 export class GenAIChatComponent {
+  chatConfig = {
+    apiUrl: 'http://localhost:3000',
+    mode: 'genai' as const,
+    theme: 'light' as const,
+    position: 'bottom-right' as const,
+    enableExport: false,  // GenAI mode doesn't support export
+    welcomeMessage: 'Hello! I\'m PharmaGenie\'s GenAI assistant, powered by HCL AI Cafe. Ask me anything!'
+  };
   exampleQueries = [
     'Tell me about Phase III clinical trials for diabetes',
     'What drugs are currently in our database?',

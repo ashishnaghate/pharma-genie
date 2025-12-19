@@ -94,9 +94,16 @@ export interface ChatResponse {
 
 export interface PharmaGenieConfig {
   apiUrl: string;
+  mode?: 'nlp' | 'genai';  // NLP uses backend API, GenAI uses HCL AI Cafe
   theme?: 'light' | 'dark';
   position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
   enableExport?: boolean;
   placeholder?: string;
   welcomeMessage?: string;
+  // GenAI specific config
+  genaiConfig?: {
+    hclAICafeUrl?: string;
+    hclAICafeApiKey?: string;
+    model?: string;
+  };
 }

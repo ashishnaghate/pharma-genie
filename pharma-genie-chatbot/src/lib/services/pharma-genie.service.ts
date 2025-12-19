@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { ChatMessage, ChatResponse, TrialData, PharmaGenieConfig } from '../models/chat.models';
 
@@ -9,6 +9,7 @@ import { ChatMessage, ChatResponse, TrialData, PharmaGenieConfig } from '../mode
 export class PharmaGenieService {
   private config: PharmaGenieConfig = {
     apiUrl: 'http://localhost:3000',
+    mode: 'nlp',  // Default to NLP mode
     theme: 'light',
     position: 'bottom-right',
     enableExport: true,
@@ -61,9 +62,18 @@ export class PharmaGenieService {
 
     this.loadingSubject.next(true);
 
+    // Route to appropriate service based on mode
+    if (this.config.mode === 'genai') {
+      this.sendGenAIMessage(query);
+    } else {
+      this.sendNLPMessage(query);
+    }
+  }
+
+  private sendNLPMessage(query: string): void {
     this.queryChatbot(query).subscribe({
       next: (response) => {
-        console.log('🔍 Raw API Response:', response);
+        console.log('🔍 Raw NLP API Response:', response);
         this.loadingSubject.next(false);
         const botMessage = this.createBotMessage(response);
         console.log('💬 Bot Message Created:', botMessage);
@@ -80,6 +90,33 @@ export class PharmaGenieService {
         };
         this.messagesSubject.next([...this.messagesSubject.value, errorMessage]);
         console.error('Chat error:', error);
+      }
+    });
+  }
+
+  private sendGenAIMessage(query: string): void {
+    // Use backend GenAI endpoint which handles HCL AI Cafe integration
+    this.http.post<ChatResponse>(`${this.config.apiUrl}/api/genai/chat`, { 
+      message: query 
+    }).subscribe({
+      next: (response) => {
+        this.loadingSubject.next(false);
+        const botMessage = this.createBotMessage(response);
+        this.messagesSubject.next([...this.messagesSubject.value, botMessage]);
+      },
+      error: (error) => {
+        this.loadingSubject.next(false);
+        const errorMsg = error.error?.message || error.message || 'Failed to get GenAI response';
+        
+        const errorMessage: ChatMessage = {
+          id: this.generateId(),
+          text: `Sorry, I encountered an error: ${errorMsg}. Please try again.`,
+          sender: 'bot',
+          timestamp: new Date(),
+          type: 'text'
+        };
+        this.messagesSubject.next([...this.messagesSubject.value, errorMessage]);
+        console.error('GenAI error:', error);
       }
     });
   }

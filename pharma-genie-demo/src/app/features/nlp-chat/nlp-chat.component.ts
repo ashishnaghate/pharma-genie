@@ -12,6 +12,7 @@ import { ChatbotComponent } from 'pharma-genie-chatbot';
 export class NlpChatComponent {
   chatConfig = {
     apiUrl: 'http://localhost:3000',
+    mode: 'nlp' as const,  // Explicitly set NLP mode
     theme: 'light' as const,
     position: 'bottom-right' as const,
     enableExport: true,

@@ -23,7 +23,7 @@
         </div>
         <div class="pg-header-text">
           <h3>PharmaGenie</h3>
-          <p>Clinical Trials Assistant</p>
+          <p>{{ chatbotMode }}</p>
         </div>
       </div>
       <div class="pg-header-actions">
@@ -149,8 +149,8 @@
                   </div>
                 </details>
                 
-                <!-- Export buttons for consolidated data -->
-                <div *ngIf="message.data.summary && message.data.summary.totalRecords > 1" class="pg-export-actions" style="margin-top: 15px;">
+                <!-- Export buttons for consolidated data (NLP mode only) -->
+                <div *ngIf="!isGenAIMode && message.data.summary && message.data.summary.totalRecords > 1" class="pg-export-actions" style="margin-top: 15px;">
                   <div style="font-size: 12px; color: #6b7280; margin-bottom: 8px; font-weight: 500;">
                     📥 Export {{ message.data.summary.totalRecords }} records:
                   </div>
