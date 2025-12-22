@@ -100,6 +100,7 @@ export interface PharmaGenieConfig {
   enableExport?: boolean;
   placeholder?: string;
   welcomeMessage?: string;
+  clearOnInit?: boolean;  // Clear chat history when component initializes
   // GenAI specific config
   genaiConfig?: {
     hclAICafeUrl?: string;

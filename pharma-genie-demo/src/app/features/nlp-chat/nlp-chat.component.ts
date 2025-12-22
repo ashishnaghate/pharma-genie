@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ChatbotComponent } from 'pharma-genie-chatbot';
 
@@ -9,14 +9,15 @@ import { ChatbotComponent } from 'pharma-genie-chatbot';
   templateUrl: './nlp-chat.component.html',
   styleUrls: ['./nlp-chat.component.css']
 })
-export class NlpChatComponent {
+export class NlpChatComponent implements OnInit {
   chatConfig = {
     apiUrl: 'http://localhost:3000',
     mode: 'nlp' as const,  // Explicitly set NLP mode
     theme: 'light' as const,
     position: 'bottom-right' as const,
     enableExport: true,
-    welcomeMessage: 'Hello! I\'m PharmaGenie. Ask me about clinical trials, drug studies, and research data.'
+    welcomeMessage: 'Hello! I\'m PharmaGenie. Ask me about clinical trials, drug studies, and research data.',
+    clearOnInit: true  // Clear chat history when component loads
   };
 
   exampleQueries = [
@@ -31,4 +32,8 @@ export class NlpChatComponent {
     'Hypertension trials',
     'Cancer research phase 1'
   ];
+
+  ngOnInit(): void {
+    // Component initialized - chatbot will handle clearing based on clearOnInit flag
+  }
 }

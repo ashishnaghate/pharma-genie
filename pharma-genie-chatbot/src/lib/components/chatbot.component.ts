@@ -32,6 +32,11 @@ export class ChatbotComponent implements OnInit, OnDestroy {
 
     this.currentConfig = this.pharmaGenieService.getConfig();
 
+    // Clear messages if clearOnInit flag is set (fixes history persistence when switching modes)
+    if (this.currentConfig?.clearOnInit) {
+      this.pharmaGenieService.clearMessages();
+    }
+
     this.pharmaGenieService.messages$
       .pipe(takeUntil(this.destroy$))
       .subscribe(messages => {

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ChatbotComponent } from 'pharma-genie-chatbot';
 
@@ -9,14 +9,15 @@ import { ChatbotComponent } from 'pharma-genie-chatbot';
   templateUrl: './genai-chat.component.html',
   styleUrls: ['./genai-chat.component.css']
 })
-export class GenAIChatComponent {
+export class GenAIChatComponent implements OnInit {
   chatConfig = {
     apiUrl: 'http://localhost:3000',
     mode: 'genai' as const,
     theme: 'light' as const,
     position: 'bottom-right' as const,
     enableExport: true,  // ✅ Enable export for GenAI mode
-    welcomeMessage: 'Hello! I\'m PharmaGenie\'s GenAI assistant, powered by HCL AI Cafe. Ask me anything!'
+    welcomeMessage: 'Hello! I\'m PharmaGenie\'s GenAI assistant, powered by HCL AI Cafe. Ask me anything!',
+    clearOnInit: true  // Clear chat history when component loads
   };
   exampleQueries = [
     'Tell me about Phase III clinical trials for diabetes',
@@ -26,4 +27,8 @@ export class GenAIChatComponent {
     'Explain the trial site capabilities',
     'How many participants are enrolled in active trials?'
   ];
+
+  ngOnInit(): void {
+    // Component initialized - chatbot will handle clearing based on clearOnInit flag
+  }
 }
