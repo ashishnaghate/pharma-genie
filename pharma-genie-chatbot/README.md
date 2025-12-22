@@ -1,16 +1,19 @@
 # PharmaGenie Chatbot 🧬
 
-An intelligent, NLP-powered chatbot for pharmaceutical clinical trials, built as an Angular library.
+An intelligent, dual-mode AI chatbot for pharmaceutical clinical trials, built as an Angular library with NLP and GenAI capabilities.
 
 ## Features
 
+- 🤖 **Dual AI Modes** - Traditional NLP + Advanced GenAI (HCL AI Cafe)
 - 🎨 **Pharma-themed UI** - Clean, professional design with medical branding
-- 🧠 **NLP Integration** - Natural language processing for query understanding
-- 📊 **Multiple Export Formats** - CSV, Excel, Table, and Text responses
+- 🧠 **Smart Query Processing** - Natural language understanding with entity extraction
+- 💬 **Session Management** - Persistent conversation history with MongoDB
+- 📊 **Multiple Export Formats** - CSV, Excel (multi-sheet), Table, and Text responses
 - ♿ **Accessible** - WCAG 2.1 compliant with keyboard navigation
-- 📱 **Responsive** - Works on all devices
+- 📱 **Responsive** - Works on all devices and screen sizes
 - 🔌 **Easy Integration** - Drop-in component for Angular apps
-- 🔒 **Secure** - Works with local/private databases
+- 🔒 **Secure** - Works with local/private databases, input sanitization
+- 🎯 **TypeScript First** - Fully typed for better developer experience
 
 ## Installation
 
@@ -39,11 +42,29 @@ import { HttpClientModule } from '@angular/common/http';
   imports: [ChatbotComponent, HttpClientModule],
   template: `
     <h1>My Pharma App</h1>
-    <pharma-genie-chatbot [config]="chatConfig"></pharma-genie-chatbot>
+    
+    <!-- GenAI Mode (Conversational AI) -->
+    <pharma-genie-chatbot 
+      [config]="genaiConfig" 
+      [mode]="'genai'">
+    </pharma-genie-chatbot>
+    
+    <!-- NLP Mode (Fast Traditional) -->
+    <pharma-genie-chatbot 
+      [config]="nlpConfig" 
+      [mode]="'nlp'">
+    </pharma-genie-chatbot>
   `
 })
 export class AppComponent {
-  chatConfig = {
+  genaiConfig = {
+    apiUrl: 'http://localhost:3000',
+    theme: 'light',
+    position: 'bottom-left',
+    enableExport: true
+  };
+  
+  nlpConfig = {
     apiUrl: 'http://localhost:3000',
     theme: 'light',
     position: 'bottom-right',
@@ -57,16 +78,20 @@ export class AppComponent {
 ```bash
 cd pharma-genie-backend
 npm install
-npm start
+
+# Configure .env file with MongoDB and HCL AI Cafe credentials
+npm run seed  # Seed the database
+npm start     # Start server on port 3000
 ```
 
-The backend server will run on `http://localhost:3000`
+The backend server will run on `http://localhost:3000` with both NLP and GenAI endpoints.
 
 ## Configuration Options
 
 ```typescript
 interface PharmaGenieConfig {
   apiUrl: string;                    // Backend API URL
+  mode?: 'nlp' | 'genai';            // Chat mode (default: 'nlp')
   theme?: 'light' | 'dark';          // UI theme
   position?: 'bottom-right' |        // Chat position
              'bottom-left' | 
@@ -75,15 +100,71 @@ interface PharmaGenieConfig {
   enableExport?: boolean;            // Enable CSV/Excel export
   placeholder?: string;              // Input placeholder text
   welcomeMessage?: string;           // Initial greeting message
+  sessionId?: string;                // GenAI session ID (for persistence)
+  maxHistoryLength?: number;         // Max conversation history (default: 10)
 }
+```
+
+## Chat Modes
+
+### NLP Mode (Fast & Structured)
+- **Endpoint:** `/api/chat`
+- **Best For:** Quick queries, structured data retrieval, filtering
+- **Response Time:** ~200-500ms
+- **Features:**
+  - Fast pattern matching
+  - Entity extraction (phases, drugs, statuses)
+  - Keyword-based filtering
+  - Consistent structured responses
+
+**Example Queries:**
+```
+"Show all Phase III trials"
+"Find diabetes studies"
+"How many recruiting trials?"
+"Export to Excel"
+```
+
+### GenAI Mode (Conversational & Intelligent)
+- **Endpoint:** `/api/genai/chat`
+- **Best For:** Complex questions, analysis, comparisons, explanations
+- **Response Time:** ~1-3 seconds
+- **Features:**
+  - Conversational AI (HCL AI Cafe / GPT-4.1)
+  - Context-aware responses
+  - Multi-turn conversations
+  - Session persistence
+  - Database-grounded answers
+
+**Example Queries:**
+```
+"What are the most promising diabetes treatments?"
+"Compare adverse events across Phase III oncology trials"
+"Explain the difference between these drug mechanisms"
+"Which sites have the best enrollment rates?"
 ```
 
 ## Usage Examples
 
-### Basic Usage
+### Basic Usage (NLP Mode)
 
 ```typescript
-<pharma-genie-chatbot></pharma-genie-chatbot>
+<pharma-genie-chatbot 
+  [config]="{ apiUrl: 'http://localhost:3000', mode: 'nlp' }">
+</pharma-genie-chatbot>
+```
+
+### GenAI Mode with Session
+
+```typescript
+<pharma-genie-chatbot [config]="{
+  apiUrl: 'http://localhost:3000',
+  mode: 'genai',
+  sessionId: 'user-123-session',
+  theme: 'dark',
+  position: 'bottom-left',
+  welcomeMessage: 'Hello! Ask me about clinical trials.'
+}"></pharma-genie-chatbot>
 ```
 
 ### Custom Configuration
@@ -91,8 +172,10 @@ interface PharmaGenieConfig {
 ```typescript
 <pharma-genie-chatbot [config]="{
   apiUrl: 'https://api.yourcompany.com',
+  mode: 'genai',
   theme: 'dark',
   position: 'bottom-left',
+  maxHistoryLength: 20,
   welcomeMessage: 'Welcome to Clinical Trials Hub!'
 }"></pharma-genie-chatbot>
 ```
@@ -146,51 +229,118 @@ cd pharma-genie-backend
 npm install
 ```
 
-3. Start the server:
+3. Configure environment (.env):
+```env
+# MongoDB
+MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/pharmaGenie
+MONGODB_DB_NAME=pharmaGenie
+
+# GenAI (for GenAI mode)
+GENAI_PROVIDER=hcl-aicafe
+HCL_AICAFE_ENDPOINT=https://aicafe.hcl.com/...
+HCL_DEPLOYMENT_NAME=gpt-4.1
+GENAI_API_KEY=your-api-key
+
+# Server
+PORT=3000
+```
+
+4. Seed database:
+```bash
+npm run seed
+```
+
+5. Start the server:
 ```bash
 npm start
 ```
 
 ### Production Setup
 
-For production, replace the JSON data source with MongoDB:
+For production, ensure MongoDB Atlas and HCL AI Cafe are properly configured:
 
 ```javascript
-// Update server.js
-import mongoose from 'mongoose';
-
-mongoose.connect(process.env.MONGODB_URI);
-
-const TrialSchema = new mongoose.Schema({
-  id: String,
-  title: String,
-  // ... other fields
+// MongoDB with connection pooling
+mongoose.connect(process.env.MONGODB_URI, {
+  maxPoolSize: 10,
+  serverSelectionTimeoutMS: 5000
 });
 
-const Trial = mongoose.model('Trial', TrialSchema);
+// GenAI with rate limiting
+RATE_LIMIT_MAX_REQUESTS=100
+RATE_LIMIT_WINDOW_MS=900000
 ```
 
 ## NLP Integration
 
-The chatbot uses two NLP libraries for query analysis:
+The chatbot uses two powerful NLP libraries for query analysis:
 
-### 1. Natural.js
-- Tokenization
-- TF-IDF keyword extraction
-- Text classification
+### 1. Natural.js (8.x)
+- **Tokenization** - Break queries into meaningful tokens
+- **TF-IDF** - Keyword extraction and relevance scoring
+- **Stemming** - Normalize words to root forms
+- **Text Classification** - Intent detection
 
-### 2. Compromise
-- Named entity recognition
-- Date/number extraction
-- Part-of-speech tagging
+### 2. Compromise (14.x)
+- **Named Entity Recognition** - Extract trial IDs, drugs, phases
+- **Date/Number Extraction** - Parse temporal and numeric data
+- **Part-of-Speech Tagging** - Grammatical analysis
+- **Entity Normalization** - Standardize extracted entities
 
-### How It Works
+### NLP Processing Flow
 
-1. **Intent Detection** - Identifies query type (list, count, filter, export)
-2. **Entity Extraction** - Extracts trial IDs, drugs, phases, statuses
-3. **Keyword Matching** - Finds relevant terms for database filtering
-4. **Filter Building** - Constructs database queries from natural language
-5. **Response Formatting** - Returns results in requested format
+```
+User Query: "Show me active Phase III diabetes trials"
+     ↓
+┌────────────────────────────────────────────┐
+│  1. Intent Detection                       │
+│     → "list" (show/find/list)             │
+└────────────────────────────────────────────┘
+     ↓
+┌────────────────────────────────────────────┐
+│  2. Entity Extraction                      │
+│     → status: "active"                     │
+│     → phase: "Phase III"                   │
+│     → indication: "diabetes"               │
+└────────────────────────────────────────────┘
+     ↓
+┌────────────────────────────────────────────┐
+│  3. Keyword Analysis                       │
+│     → ["diabetes", "trials", "phase"]     │
+└────────────────────────────────────────────┘
+     ↓
+┌────────────────────────────────────────────┐
+│  4. MongoDB Query Builder                  │
+│     { status: "Recruiting",                │
+│       phase: "Phase III",                  │
+│       indication: /diabetes/i }            │
+└────────────────────────────────────────────┘
+     ↓
+┌────────────────────────────────────────────┐
+│  5. Database Query with Population         │
+│     .populate('sites participants drugs')  │
+└────────────────────────────────────────────┘
+     ↓
+  Formatted Response
+```
+
+### Supported Intents
+
+- **list** - Show/find/list trials
+- **count** - Count/total/how many
+- **status** - Filter by trial status
+- **filter** - Complex multi-field filtering
+- **export** - Export to CSV/Excel
+- **specific** - Get specific trial by ID
+
+### Entity Types
+
+- **Trial IDs** - CT-YYYY-NNN pattern
+- **Phases** - Phase I, II, III, IV
+- **Status** - Active, Recruiting, Completed, Suspended
+- **Drugs** - Drug IDs (ABC123, XYZ789)
+- **Indications** - Disease names (Diabetes, Cancer, Alzheimer's)
+- **Numbers** - Counts, thresholds
 
 ## Security Best Practices
 

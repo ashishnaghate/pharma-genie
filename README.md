@@ -1,23 +1,35 @@
 # 🧬 PharmaGenie - Clinical Trials Intelligence
 
-**An intelligent NLP-powered chatbot for pharmaceutical clinical trials**
+**An intelligent AI-powered chatbot for pharmaceutical clinical trials with dual NLP and GenAI capabilities**
 
 [![Angular](https://img.shields.io/badge/Angular-17.3.x-red)](https://angular.io/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.4.x-blue)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-20.x-green)](https://nodejs.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green)](https://www.mongodb.com/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-PharmaGenie is a professional chatbot application for querying pharmaceutical clinical trials using Natural Language Processing (NLP). Built with Angular 17, TypeScript 5.4, Node.js, and Express.
+PharmaGenie is an enterprise-grade chatbot application for pharmaceutical clinical trials, featuring dual AI capabilities: traditional NLP and advanced GenAI integration. Built with Angular 17, TypeScript 5.4, Node.js, Express, and MongoDB Atlas.
 
-## ✨ Features
+## ✨ Key Features
 
-- 🧠 **NLP-Powered** - Natural language query processing using Natural.js and Compromise
-- 📊 **Multi-Format Export** - Export data to CSV and Excel with professional formatting
-- 🎨 **Pharma-Themed UI** - Professional medical design with blue/green color scheme
-- ♿ **Accessible** - WCAG 2.1 compliant with keyboard navigation
+### Dual AI Capabilities
+- 🧠 **NLP Mode** - Fast, traditional query processing using Natural.js and Compromise
+- 🤖 **GenAI Mode** - Advanced conversational AI powered by HCL AI Cafe (GPT-4.1)
+- 🔄 **Seamless Switching** - Toggle between modes based on query complexity
+
+### Data & Integration
+- 💾 **MongoDB Atlas** - Cloud-based NoSQL database with 5 collections
+- 🔗 **Relational Data** - Mongoose ODM with population support
+- 📊 **Multi-Format Export** - CSV and Excel with multi-sheet support
+- 🔍 **Advanced Search** - Full-text search across clinical trials
+
+### Enterprise Features
+- 💬 **Session Management** - Persistent chat history with MongoDB
+- 🛡️ **Security** - Rate limiting, input validation, CORS configured
+- 📈 **Middleware Stack** - Logging, error handling, request tracking
+- 🎨 **Pharma-Themed UI** - Professional medical design
+- ♿ **WCAG 2.1 Compliant** - Accessible with keyboard navigation
 - 📦 **NPM Package** - Reusable Angular component library
-- 🔒 **Secure** - Zero vulnerabilities, input validation, CORS configured
-- 🚀 **Optimized** - Fast builds (~135 kB) and responsive design
 
 ## 🏗️ Project Structure
 
@@ -25,17 +37,22 @@ PharmaGenie is a professional chatbot application for querying pharmaceutical cl
 pharmaGenie/
 ├── pharma-genie-backend/         # Backend API Server
 │   ├── Node.js 20.x + Express 5.x
-│   ├── NLP Engine (Natural.js + Compromise)
-│   ├── 8 Sample Clinical Trials
-│   └── CSV/Excel Export
+│   ├── MongoDB Atlas (Cloud Database)
+│   ├── Dual AI: NLP + GenAI (HCL AI Cafe)
+│   ├── 5 MongoDB Collections (Trials, Drugs, Sites, Participants, Adverse Events)
+│   ├── Chat Session Management
+│   ├── Middleware (Logging, Rate Limiting, Validation)
+│   └── CSV/Excel Multi-Sheet Export
 │
 ├── pharma-genie-chatbot/         # NPM Package (Angular Library)
 │   ├── Standalone Angular 17 Component
 │   ├── TypeScript Models & Services
+│   ├── Dual Mode Support (NLP + GenAI)
 │   └── Professional UI Components
 │
 └── pharma-genie-demo/            # Demo Application
     ├── Angular 17.3.x
+    ├── Two Chat Components (GenAI + NLP)
     ├── Imports chatbot from NPM package
     └── Example implementation
 ```
@@ -47,6 +64,7 @@ pharmaGenie/
 - Node.js 20.x or higher
 - npm 10.x or higher
 - Angular CLI 17.3.x
+- MongoDB Atlas account (or local MongoDB)
 
 ### Installation & Running
 
@@ -54,6 +72,18 @@ pharmaGenie/
 ```bash
 cd pharma-genie-backend
 npm install
+
+# Configure environment variables
+# Copy .env.example to .env and update:
+# - MONGODB_URI (your MongoDB Atlas connection string)
+# - GENAI_PROVIDER (hcl-aicafe or mock)
+# - HCL_AICAFE_ENDPOINT (HCL AI Cafe endpoint)
+# - GENAI_API_KEY (your HCL API key)
+
+# Seed the database
+npm run seed
+
+# Start the server
 npm start
 # Runs on http://localhost:3000
 ```
@@ -78,12 +108,14 @@ npm start
 ### Try It Out
 
 1. Open http://localhost:4200
-2. Click the blue chat button (bottom-right)
-3. Try: "Show all active trials"
-4. Export results to CSV or Excel
+2. **GenAI Chat** (Left panel) - Conversational AI with HCL AI Cafe
+3. **NLP Chat** (Right panel) - Fast traditional NLP queries
+4. Try: "Show all active Phase III trials"
+5. Export results to CSV or Excel
 
 ## 💬 Example Queries
 
+### NLP Mode (Fast & Structured)
 ```
 "Show all active trials"
 "Find Phase III diabetes studies"
@@ -91,6 +123,15 @@ npm start
 "How many completed trials?"
 "Tell me about NCT001"
 "Export to Excel"
+```
+
+### GenAI Mode (Conversational & Intelligent)
+```
+"What are the most promising diabetes treatments in Phase III?"
+"Compare enrollment rates across oncology trials"
+"Tell me about adverse events in ABC123 trials"
+"Which sites are most productive?"
+"Analyze participant demographics"
 ```
 
 ## 📚 Documentation
@@ -105,12 +146,28 @@ Complete documentation is available in the `/docs` folder:
 
 ## 🔌 API Endpoints
 
-- `GET /api/health` - Health check
+### NLP Chat Endpoints
+- `GET /api/health` - Health check with database stats
 - `POST /api/chat` - Process NLP query
-- `GET /api/trials` - Get all trials
-- `GET /api/trials/:id` - Get trial by ID
+- `GET /api/trials` - Get all trials (with population)
+- `GET /api/trials/:id` - Get trial by ID (with related data)
 - `POST /api/export/csv` - Export to CSV
-- `POST /api/export/excel` - Export to Excel
+- `POST /api/export/excel` - Export to Excel (multi-sheet support)
+
+### GenAI Endpoints
+- `POST /api/genai/chat` - GenAI conversational query (HCL AI Cafe)
+- `POST /api/genai/sessions` - Create chat session
+- `GET /api/genai/sessions/:id` - Get session history
+- `GET /api/genai/sessions/:id/messages` - Get session messages
+- `DELETE /api/genai/sessions/:id` - Clear session
+- `GET /api/genai/sessions` - List all sessions
+
+### Data Retrieval
+- `GET /api/drugs` - Get all drugs
+- `GET /api/drugs/:id` - Get drug by ID
+- `GET /api/sites` - Get all trial sites
+- `GET /api/participants` - Get all participants
+- `GET /api/adverse-events` - Get all adverse events
 
 ## 📦 Using as NPM Package
 
@@ -136,23 +193,39 @@ export class AppComponent {
 ## 💻 Technology Stack
 
 **Frontend**
-- Angular 17.3.x
+- Angular 17.3.x (Standalone Components)
 - TypeScript 5.4.x
 - RxJS 7.8.x
-- Standalone Components
+- Responsive Design
 
 **Backend**
 - Node.js 20.x
 - Express 5.x
-- Natural.js (NLP)
-- Compromise (NLP)
-- ExcelJS
-- Fast-CSV
+- Mongoose 9.x (ODM)
+- Natural.js 8.x (NLP)
+- Compromise 14.x (NLP)
+- ExcelJS 4.x
+- Fast-CSV 1.x
 
-**Development**
-- npm link
-- TypeScript compiler
-- Angular CLI
+**Database**
+- MongoDB Atlas (Cloud)
+- 5 Collections: Clinical Trials, Drugs, Sites, Participants, Adverse Events
+- Full-text indexing
+- Reference population
+
+**AI Integration**
+- HCL AI Cafe (GPT-4.1)
+- Provider Factory Pattern
+- Mock Provider (for testing)
+- Conversation history support
+
+**Middleware & Security**
+- Rate Limiting
+- Request Logging
+- Error Handling
+- Input Validation
+- Sanitization
+- CORS Configuration
 
 ## 🔒 Security
 
@@ -164,12 +237,16 @@ export class AppComponent {
 
 ## 📊 Project Status
 
-✅ Backend API - Operational  
-✅ NPM Package - Built & Linked  
-✅ Demo Application - Running  
-✅ Documentation - Complete  
-✅ Testing - Verified  
-✅ Production Ready
+✅ **Backend API** - Operational (MongoDB Atlas + GenAI)  
+✅ **Dual AI Modes** - NLP + GenAI (HCL AI Cafe)  
+✅ **NPM Package** - Built & Linkable  
+✅ **Demo Application** - Dual Chat Interface  
+✅ **MongoDB Collections** - 5 Collections with Relationships  
+✅ **Session Management** - Persistent Chat History  
+✅ **Middleware Stack** - Logging, Rate Limiting, Validation  
+✅ **Export Functionality** - CSV & Excel Multi-Sheet  
+✅ **Documentation** - Comprehensive & Updated  
+✅ **Production Ready** - Enterprise-Grade Architecture
 
 ## 🤝 Contributing
 
